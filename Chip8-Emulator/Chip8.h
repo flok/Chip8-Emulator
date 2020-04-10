@@ -1,11 +1,24 @@
 #pragma once
+
+
+#include <SDL/SDL.h>
+
+#include "global.h"
+
+
 class Chip8
 {
 public:
-
-	Chip8();
-
+	// Initialize the memory and fontset
 	void initialize();
+
+	bool loadFontSet();
+
+	bool loadProgramm(string path);
+
+
+	// create SDL window and key callbacks etc..
+	bool initializeGraphic();
 
 	void emulateCycle();
 
@@ -34,7 +47,7 @@ private:
 	};
 
 
-	// memory
+	// memory pointer
 	unsigned char memory[4096];
 
 	// general purpose 8 bit registers
@@ -76,6 +89,9 @@ private:
 
 
 	unsigned short opcode;
+
+
+
 
 };
 
