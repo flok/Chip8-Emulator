@@ -1,8 +1,6 @@
 //// Chip8 Core logic
 #include "Chip8.h"
 
-// Chip8 display using SDL
-#include "Chip8Display.h"
 
 #include "SDL/SDL.h"
 
@@ -12,7 +10,6 @@ using namespace std;
 
 
 Chip8 chip8;
-Chip8Display display;
 
 int main(int argc, char* argv[])
 {
@@ -26,13 +23,16 @@ int main(int argc, char* argv[])
     chip8.loadFontSet();
 
 
-    if (!display.initializeGraphic()) {
+    if (!chip8.initializeGraphic()) {
         cout << "Could not initialize graphic" << endl;
     }
 
 
 
-    while (true)
+    while (true) {
+
+        chip8.emulateCycle();
+    }
 
 
     return SUCCESS;

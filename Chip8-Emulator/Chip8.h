@@ -48,31 +48,36 @@ private:
 
 
 	// memory pointer
-	unsigned char memory[4096];
+	// 8 bit
+	uint8_t memory[4096];
 
 	// general purpose 8 bit registers
 	// V15 is not used by any programm, used as flag for some instructions.
-	unsigned char V[16];
+	uint8_t V[16];
 
 
 	// Address register
 	// can only be loaded bwith 12bit address, due to 
 	// range of memory to CHIP-8 instruction
-	unsigned short I;
+	// 16 bit
+	uint16_t I;
 
-	unsigned char delay;
-	unsigned char sound_timers;
+	// 8 bit
+	uint8_t delay;
+	uint8_t sound_timers;
 
 	// programm counter (pc)
 	// current executing address
-	unsigned short pc;
+	// 16bit
+	uint16_t pc;
 
 	// stack pointer (sp)
 	// topmost level of the stack
-	unsigned char sp;
+	// 16bit
+	uint16_t sp;
 
 	// stack
-	unsigned short stack[16];
+	uint16_t stack[16];
 
 	// keyboard
 	//	***********
@@ -81,16 +86,22 @@ private:
 	//	* 7	8 9	E *
 	//	* A	0 B	F *
 	//	***********
-	unsigned char key[16];
+	uint8_t key[16];
 
 	// display 
 	// 64 * 32 pixel big
-	unsigned char display[64 * 32];
+	uint8_t display[64 * 32];
 
 
-	unsigned short opcode;
+	uint16_t opcode;
 
 
+
+	SDL_Window* gWindow = NULL;
+
+	SDL_Renderer* gRenderer = NULL;
+
+	SDL_Surface* gScreenSurface = NULL;
 
 
 };

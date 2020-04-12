@@ -157,11 +157,9 @@
   <ItemGroup>
     <ClCompile Include="Chip8-Emulator.cpp" />
     <ClCompile Include="Chip8.cpp" />
-    <ClCompile Include="Chip8Display.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Chip8.h" />
-    <ClInclude Include="Chip8Display.h" />
     <ClInclude Include="global.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
