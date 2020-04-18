@@ -20,7 +20,25 @@ public:
 	// create SDL window and key callbacks etc..
 	bool initializeGraphic();
 
+	void UpdateGraphic();
+
 	void emulateCycle();
+
+	// keyboard
+//	***********
+//	* 1	2 3	C *
+//	* 4 5 6	D *
+//	* 7	8 9	E *
+//	* A	0 B	F *
+//	***********
+	uint8_t key[16];
+
+	SDL_Window* gWindow = NULL;
+
+	SDL_Renderer* gRenderer = NULL;
+
+	SDL_Texture* gScreenTexture = NULL;
+
 
 private:
 
@@ -79,29 +97,19 @@ private:
 	// stack
 	uint16_t stack[16];
 
-	// keyboard
-	//	***********
-	//	* 1	2 3	C *
-	//	* 4 5 6	D *
-	//	* 7	8 9	E *
-	//	* A	0 B	F *
-	//	***********
-	uint8_t key[16];
+
 
 	// display 
 	// 64 * 32 pixel big
 	uint8_t display[64 * 32];
+	bool draw = false;
 
 
 	uint16_t opcode;
 
 
 
-	SDL_Window* gWindow = NULL;
 
-	SDL_Renderer* gRenderer = NULL;
-
-	SDL_Surface* gScreenSurface = NULL;
 
 
 };

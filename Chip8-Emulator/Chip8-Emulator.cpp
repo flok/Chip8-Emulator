@@ -1,4 +1,7 @@
 //// Chip8 Core logic
+
+#include <Windows.h>
+
 #include "Chip8.h"
 
 
@@ -6,6 +9,11 @@
 
 // Console output
 #include <iostream>
+#include <thread>
+#include <chrono>
+
+
+
 using namespace std;
 
 
@@ -27,11 +35,20 @@ int main(int argc, char* argv[])
         cout << "Could not initialize graphic" << endl;
     }
 
+    uint8_t t = 0xfe;
 
 
     while (true) {
-
+        // do the opcode stuff
         chip8.emulateCycle();
+
+        // do the SDL display magic
+        chip8.UpdateGraphic();
+
+
+        // slow the emulation speed to the real speed of chip8
+        //this_thread::sleep_for(chrono::microseconds(1200));
+        Sleep(1.2f);
     }
 
 
