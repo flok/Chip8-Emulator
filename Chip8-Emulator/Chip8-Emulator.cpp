@@ -100,8 +100,7 @@ int main(int argc, char* argv[]) {
 		}
 
 		// slow the emulation speed to the real speed of chip8
-		//this_thread::sleep_for(chrono::microseconds(1200));
-		Sleep(1.2f);
+		this_thread::sleep_for(chrono::microseconds(1200));
 	}
 
 
