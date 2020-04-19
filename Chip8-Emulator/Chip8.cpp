@@ -21,7 +21,7 @@ void Chip8::initialize() {
 	this->sound_timers = 0;
 
 	// reset programm counter and stackpointer
-	this->pc = 0;
+	this->pc = 512;
 	this->sp = 0;
 
 	// reset stack
@@ -39,7 +39,7 @@ void Chip8::initialize() {
 
 
 bool Chip8::loadFontSet() {
-	memcpy(&memory[0], chip8_fontset, 80);
+	//memcpy(&memory[0], chip8_fontset, 80);
 
 	return SUCCESS;
 }
@@ -67,13 +67,10 @@ bool Chip8::loadProgramm(string path) {
 void Chip8::emulateCycle() {
 
 	// increase programm counter by 2 bytes
-	this->pc += 2;
 
 	// OPC is 16 bit because we are merging 2 memory positions with each 8 bit
 	// 8 bit + 8 bit = 16 bit
 	uint16_t _curOPC = ((this->memory[this->pc] << 8) | this->memory[this->pc + 1]);
-	//cout << _curOPC << endl;
-	uint16_t opcode = 0;
 
 	uint8_t N = _curOPC & 0x000F; // lowest 4 bits
 	uint8_t NN = _curOPC & 0x00FF; // lowest 8 bits
@@ -89,10 +86,13 @@ void Chip8::emulateCycle() {
 			// calc the 2 diffrent sub opcodes
 			switch (N) {
 				case 0x0000:
+				{
 					// clear display
 					this->display[2047] = { 0 };
+					this->draw = true;
 					this->pc += 2;
 					break;
+				}
 				case 0x000E:
 					// Return from a subroutine
 					--this->sp;
@@ -101,7 +101,9 @@ void Chip8::emulateCycle() {
 					break;
 				default:
 					cout << "Unknown OPC " << _curOPC << endl;
+					break;
 			}
+			break;
 			// 0x1___
 		case 0x1000:
 			// jump to address NNN without return
@@ -111,7 +113,7 @@ void Chip8::emulateCycle() {
 		case 0x2000:
 			// Execute subroutine starting at address NNN
 			// save current programmcounter to stack
-			this->stack[sp] = this->pc;
+			this->stack[this->sp] = this->pc;
 			// increase stackpointer to new free stack place
 			++this->sp;
 			// goto adress
@@ -165,8 +167,6 @@ void Chip8::emulateCycle() {
 		case 0x6000:
 			// 6XNN
 			// Store number NN in register VX
-			cout << (opcode & 0x00FF) << endl;
-			cout << NN << endl;
 			this->V[X] = NN;
 			this->pc += 2;
 			break;
@@ -178,7 +178,7 @@ void Chip8::emulateCycle() {
 			break;
 		case 0x8000:
 
-			switch (_curOPC & 0x000F) {
+			switch (N) {
 				case 0x0000:
 					// 8XY0
 					// Store the value of register VY in register VX
@@ -207,18 +207,16 @@ void Chip8::emulateCycle() {
 					// Add the value of register VY to register VX
 					// Set VF to 01 if a carry occurs
 					// Set VF to 00 if a carry does not occur
-
+					// compute here
+					V[X] += V[Y];
 					// we need to first determine if a carry will be set before adding the values otherwise false result
-					// 0xFF - V[Y] computes the maximum number that can be added to V[X] without overflowing (carry)
+	// 0xFF - V[Y] computes the maximum number that can be added to V[X] without overflowing (carry)
 					if (V[X] > (0xFF - V[Y])) {
 						V[0xF] = 1; // carry
 					}
 					else {
 						V[0xF] = 0; // no carry 
 					}
-
-					// compute here
-					V[X] += V[Y];
 
 					this->pc += 2;
 					break;
@@ -227,32 +225,29 @@ void Chip8::emulateCycle() {
 					// Set VF to 00 if a borrow occurs
 					// Set VF to 01 if a borrow does not occur
 					if (this->V[X] < this->V[Y]) {
-						this->V[0xF] = 00;
+						this->V[0xF] = 0;
 					}
 					else {
-						this->V[0xF] = 01;
+						this->V[0xF] = 1;
 					}
-
 					this->V[X] -= this->V[Y];
-
 					this->pc += 2;
 					break;
 				case 0x0006:
 					// Store the value of register VY shifted right one bit in register VX
 					// Set register VF to the least significant bit prior to the shift VY is unchanged
-
 					this->V[0xF] = this->V[Y] & 0x1;
 					// shift left 
-					this->V[X] = this->V[Y] >> 1;
+					this->V[X] = this->V[Y] >>= 1;
 
 					this->pc += 2;
 					break;
 				case 0x0007:
-					if (this->V[X] < this->V[Y]) {
-						this->V[0xF] = 00;
+					if (this->V[X] > this->V[Y]) {
+						this->V[0xF] = 0;
 					}
 					else {
-						this->V[0xF] = 01;
+						this->V[0xF] = 1;
 					}
 					this->V[X] = this->V[Y] - this->V[X];
 					this->pc += 2;
@@ -261,7 +256,7 @@ void Chip8::emulateCycle() {
 					// Store the value of register VY shifted right one bit in register VX
 					// Set register VF to the least significant bit prior to the shift VY is unchanged
 
-					this->V[0xF] = this->V[X] >> 0x7;
+					this->V[0xF] = this->V[X] >> 7;
 					// shift left 
 					this->V[X] = this->V[X] <<= 1;
 
@@ -288,36 +283,39 @@ void Chip8::emulateCycle() {
 			this->pc = NNN + this->V[0];
 			break;
 		case 0xC000:
-			this->V[X] = (rand() % (0xFF + 1) + NN);
+			this->V[X] = (rand() % (0xFF + 1) & NN);
 			this->pc += 2;
 			break;
 
 			// display drawing
 		case 0xD000:
+
+
 			// Draw a sprite at position VX, VY with N bytes of sprite data starting at the address stored in I
 			// Set VF to 01 if any set pixels are changed to unset, and 00 otherwise
 		{
 			uint8_t xCord = this->V[X];
 			uint8_t yCord = this->V[Y];
 
-
+			V[0xF] = 0; // reset V[F] cause  we maybe set it to 1
 			for (int row = 0; row < N; row++) {
 				uint8_t pixel = this->memory[this->I + row];
 				//cout << pixel << endl;
 
 				for (int column = 0; column < 8; column++) {
-					if (pixel & (0x0080 >> column)) {
-						if (this->display[xCord + column + ((yCord + row) * 64)] == 1) {
+					if ((pixel & (0x0080 >> column)) != 0) {
+						if (this->display[(xCord + column + ((yCord + row) * 64))] == 1) {
 							this->V[0xF] = 1;
 						}
-						this->display[xCord + column + ((yCord + row) * 64)] ^= 1;
+						this->display[(xCord + column + ((yCord + row) * 64))] ^= 1;
 					}
 				}
 
 			}
 			//cout << "-----------------" << endl;
-			this->draw = true;
 			this->pc += 2;
+			this->draw = true;
+
 			break;
 		}
 		case 0xE000:
@@ -451,30 +449,4 @@ bool Chip8::initializeGraphic() {
 	gScreenTexture = SDL_CreateTexture(gRenderer, SDL_PIXELFORMAT_ABGR8888, SDL_TEXTUREACCESS_STREAMING, SCREEN_WIDTH, SCREEN_HEIGHT);
 
 	return SUCCESS;
-}
-
-void Chip8::UpdateGraphic() {
-	// we need to convert the uint8_t pixels to uint32_t for the display using SDL2
-	// temporary buffer 
-
-
-	if (this->draw) {
-		this->draw = false;
-		uint32_t screen[2048];
-		cout << "Update UI" << endl;
-		for (int i = 0; i < 2048; ++i) {
-			uint8_t pixel = this->display[i];
-			screen[i] = (0x00FFFFFF * pixel) | 0xFF000000;
-		}
-
-
-		// update the texture with the new pixel data
-		SDL_UpdateTexture(gScreenTexture, NULL, screen, 64 * sizeof(uint32_t));
-
-		// Clear screen and rerender
-		SDL_RenderClear(gRenderer);
-		SDL_RenderCopy(gRenderer, gScreenTexture, NULL, NULL);
-		SDL_RenderPresent(gRenderer);
-
-	}
 }

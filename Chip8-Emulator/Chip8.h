@@ -33,6 +33,32 @@ public:
 //	***********
 	uint8_t key[16];
 
+	// Keypad keymap
+	uint8_t keymap[16] = {
+		SDL_SCANCODE_X,
+		SDL_SCANCODE_1,
+		SDL_SCANCODE_2,
+		SDL_SCANCODE_3,
+		SDL_SCANCODE_Q,
+		SDL_SCANCODE_W,
+		SDL_SCANCODE_E,
+		SDL_SCANCODE_A,
+		SDL_SCANCODE_S,
+		SDL_SCANCODE_D,
+		SDL_SCANCODE_Y,
+		SDL_SCANCODE_C,
+		SDL_SCANCODE_4,
+		SDL_SCANCODE_R,
+		SDL_SCANCODE_F,
+		SDL_SCANCODE_V,
+	};
+
+
+	// display 
+// 64 * 32 pixel big
+	uint8_t display[64 * 32];
+	bool draw = false;
+
 	SDL_Window* gWindow = NULL;
 
 	SDL_Renderer* gRenderer = NULL;
@@ -63,6 +89,8 @@ private:
 	  0xF0, 0x80, 0xF0, 0x80, 0xF0, // E
 	  0xF0, 0x80, 0xF0, 0x80, 0x80  // F
 	};
+
+
 
 
 	// memory pointer
@@ -99,10 +127,7 @@ private:
 
 
 
-	// display 
-	// 64 * 32 pixel big
-	uint8_t display[64 * 32];
-	bool draw = false;
+
 
 
 	uint16_t opcode;
